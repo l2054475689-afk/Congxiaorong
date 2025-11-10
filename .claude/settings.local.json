@@ -21,7 +21,10 @@
       "Bash(findstr:*)",
       "Bash(NUL)",
       "Bash(git config:*)",
-      "Bash(cmd /c:*)"
+      "Bash(cmd /c:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull origin main --allow-unrelated-histories --no-edit)"
     ],
     "deny": [],
     "ask": []
