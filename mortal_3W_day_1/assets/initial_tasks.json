@@ -1,0 +1,18 @@
+{
+    "positive_tasks": [
+        {"name": "早起", "spirit_effect": 1, "blood_effect": 0},
+        {"name": "晨跑30分钟", "spirit_effect": 1, "blood_effect": 1},
+        {"name": "八部金刚功", "spirit_effect": 1, "blood_effect": 2},
+        {"name": "冥想15分钟", "spirit_effect": 2, "blood_effect": 0},
+        {"name": "阅读1小时", "spirit_effect": 1, "blood_effect": 0},
+        {"name": "控制情绪", "spirit_effect": 1, "blood_effect": 0},
+        {"name": "打扫房间", "spirit_effect": 1, "blood_effect": 0}
+    ],
+    "negative_tasks": [
+        {"name": "熬夜", "spirit_effect": -3, "blood_effect": -1},
+        {"name": "刷自媒体", "spirit_effect": -3, "blood_effect": 0},
+        {"name": "打游戏", "spirit_effect": -3, "blood_effect": 0},
+        {"name": "发脾气", "spirit_effect": -3, "blood_effect": -3},
+        {"name": "晚起", "spirit_effect": -2, "blood_effect": 0}
+    ]
+}

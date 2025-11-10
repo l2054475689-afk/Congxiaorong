@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(cd:*)",
+      "Bash(python:*)",
+      "Bash(pip show:*)",
+      "Bash(timeout:*)",
+      "Bash(set HTTP_PROXY=http://127.0.0.1:7890)",
+      "Bash(set HTTPS_PROXY=http://127.0.0.1:7890)",
+      "Bash(flet build:*)",
+      "Bash(pip install:*)",
+      "Bash(pip config:*)",
+      "Bash(curl:*)",
+      "Bash(chcp 65001)",
+      "Bash(set:*)",
+      "Bash(dir:*)",
+      "Bash(nul)",
+      "Bash(wsl --list:*)",
+      "Bash(ping:*)",
+      "Bash(findstr:*)",
+      "Bash(NUL)",
+      "Bash(git config:*)",
+      "Bash(cmd /c:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

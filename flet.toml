@@ -1,0 +1,17 @@
+[app]
+name = "凡人修仙3w天"
+description = "个人生命管理应用，通过游戏化的修仙概念管理人生"
+version = "1.0.0"
+author = "产品团队"
+
+[android]
+package = "com.fanrenxiuxian.app"
+permissions = [
+    "INTERNET",
+    "WRITE_EXTERNAL_STORAGE",
+    "READ_EXTERNAL_STORAGE"
+]
+adaptive_icon_background = "#8B5CF6"
+
+[ios]
+bundle_id = "com.fanrenxiuxian.app"

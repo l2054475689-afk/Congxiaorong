@@ -1,0 +1,21 @@
+# 凡人修仙3w天 - 移动端依赖包
+# 用于 Android/iOS 打包
+
+# 核心框架
+flet>=0.21.0
+
+# 数据库
+sqlalchemy>=2.0.0
+
+# 网络请求
+requests>=2.30.0
+
+# 图片处理
+Pillow>=10.0.0
+
+# 注意：以下包在移动端可能不兼容，已移除：
+# - reportlab (PDF生成，在Android上不稳定)
+# - pandas (体积大，可选)
+# - openpyxl (Excel支持，可选)
+# - schedule (使用Flet内置定时器替代)
+# - psutil (Android不支持)
