@@ -20,8 +20,11 @@ def get_app_data_dir():
                 from android.storage import app_storage_path
                 return Path(app_storage_path())
             except:
-                # 如果导入失败，使用备用路径
-                app_data = '/data/data/com.fanrenxiuxian.app/files'
+                # 如果导入失败，使用临时目录
+                import tempfile
+                app_data = Path(tempfile.gettempdir()) / 'fanrenxiuxian'
+                app_data.mkdir(exist_ok=True)
+                return app_data
         elif os.name == 'nt':  # Windows
             app_data = os.path.expanduser('~\\AppData\\Local\\FanRenXiuXian')
         else:  # Linux/Mac
@@ -30,9 +33,13 @@ def get_app_data_dir():
         # 创建目录如果不存在
         os.makedirs(app_data, exist_ok=True)
         return Path(app_data)
-    except:
-        # 如果以上都失败，使用当前目录
-        return Path(__file__).parent
+    except Exception as e:
+        print(f"获取应用数据目录失败: {e}")
+        # 如果以上都失败，使用临时目录
+        import tempfile
+        fallback_dir = Path(tempfile.gettempdir()) / 'fanrenxiuxian'
+        fallback_dir.mkdir(exist_ok=True)
+        return fallback_dir
 
 BASE_DIR = get_app_data_dir()
 DB_PATH = BASE_DIR / "immortal_cultivation.db"
