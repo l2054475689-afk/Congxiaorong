@@ -33,13 +33,7 @@ jobs:
 
     - name: Convert icon to PNG
       run: |
-        python << 'EOF'
-        from PIL import Image
-        img = Image.open('icon.jpg')
-        img = img.convert('RGBA')
-        img.save('icon.png', 'PNG')
-        print('Icon converted to PNG successfully')
-        EOF
+        python -c "from PIL import Image; img = Image.open('icon.jpg'); img = img.convert('RGBA'); img.save('icon.png', 'PNG'); print('Icon converted to PNG successfully')"
 
     - name: Set up Java
       uses: actions/setup-java@v4
