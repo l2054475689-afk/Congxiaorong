@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 
 from database.models import Task, UserData, TaskRecord, FamilyMember, FamilyEvent, Friend, FriendRelation, FriendTask, InteractionRecord
-from config import DB_PATH, GameConfig
+from config import GameConfig
 
 class DatabaseManager:
     """数据库管理器 - 性能优化版"""

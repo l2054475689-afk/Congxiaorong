@@ -16,10 +16,22 @@ def get_app_data_dir():
         # 首先尝试检测是否在Android环境
         if 'ANDROID_STORAGE' in os.environ or sys.platform == 'android' or hasattr(sys, 'getandroidapilevel'):
             # Android平台：使用当前工作目录（Flet会自动设置为应用私有目录）
-            app_data = Path.cwd() / 'data'
-            app_data.mkdir(exist_ok=True)
-            print(f"Android环境：使用应用私有存储 {app_data}")
-            return app_data
+            try:
+                app_data = Path.cwd() / 'data'
+                app_data.mkdir(exist_ok=True)
+                return app_data
+            except Exception as e:
+                # Android上如果创建失败，使用/data/data目录
+                try:
+                    app_data = Path('/data/data') / 'com.fanrenxiuxian.app' / 'files' / 'data'
+                    app_data.mkdir(parents=True, exist_ok=True)
+                    return app_data
+                except:
+                    # 最后降级到临时目录
+                    import tempfile
+                    app_data = Path(tempfile.gettempdir()) / 'fanrenxiuxian' / 'data'
+                    app_data.mkdir(parents=True, exist_ok=True)
+                    return app_data
         elif os.name == 'nt':  # Windows
             app_data = Path(os.path.expanduser('~\\AppData\\Local\\FanRenXiuXian'))
         else:  # Linux/Mac
@@ -27,17 +39,25 @@ def get_app_data_dir():
 
         # 创建目录如果不存在
         app_data.mkdir(parents=True, exist_ok=True)
-        print(f"桌面环境：使用数据目录 {app_data}")
         return app_data
     except Exception as e:
-        print(f"获取应用数据目录失败: {e}，使用当前目录")
-        # 如果以上都失败，使用当前目录的data子目录
-        fallback_dir = Path.cwd() / 'data'
-        fallback_dir.mkdir(exist_ok=True)
+        # 如果以上都失败，使用临时目录
+        import tempfile
+        fallback_dir = Path(tempfile.gettempdir()) / 'fanrenxiuxian'
+        fallback_dir.mkdir(parents=True, exist_ok=True)
         return fallback_dir
 
-BASE_DIR = get_app_data_dir()
-DB_PATH = BASE_DIR / "immortal_cultivation.db"
+# 延迟初始化，避免导入时出错
+BASE_DIR = None
+DB_PATH = None
+
+def init_paths():
+    """初始化路径（延迟初始化）"""
+    global BASE_DIR, DB_PATH
+    if BASE_DIR is None:
+        BASE_DIR = get_app_data_dir()
+        DB_PATH = BASE_DIR / "immortal_cultivation.db"
+    return BASE_DIR, DB_PATH
 
 # 主题配置
 class ThemeConfig:
