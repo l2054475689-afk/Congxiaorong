@@ -3,13 +3,12 @@ name = "凡人修仙3万天"
 description = "个人生命管理应用，通过游戏化的修仙概念管理人生"
 version = "1.0.0"
 author = "产品团队"
+icon = "icon.png"
 
 [android]
 package = "com.fanrenxiuxian.app"
 permissions = [
-    "INTERNET",
-    "WRITE_EXTERNAL_STORAGE",
-    "READ_EXTERNAL_STORAGE"
+    "INTERNET"
 ]
 adaptive_icon_background = "#8B5CF6"
 

@@ -5,7 +5,7 @@ from config import ThemeConfig
 def main(page: ft.Page):
     """主函数 - 自适应版"""
     # 设置页面基本属性
-    page.title = "凡人修仙3w天"
+    page.title = "凡人修仙3万天"
     page.theme_mode = ft.ThemeMode.LIGHT
     page.bgcolor = ThemeConfig.BG_COLOR
 
@@ -19,10 +19,7 @@ def main(page: ft.Page):
     page.padding = 0
     page.spacing = 0
 
-    # 设置字体和主题
-    page.fonts = {
-        "PingFang": "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap"
-    }
+    # 设置主题（移除外部字体依赖，避免国内网络问题）
     page.theme = ft.Theme(
         color_scheme_seed=ThemeConfig.PRIMARY_COLOR,
         use_material3=True,
