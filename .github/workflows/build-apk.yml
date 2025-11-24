@@ -63,7 +63,7 @@ jobs:
     - name: Build APK
       run: |
         echo "Building APK with Flet..."
-        flet build apk --module main_mobile
+        flet build apk
 
     - name: Rename APK
       run: |

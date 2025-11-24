@@ -10,9 +10,9 @@ def main(page: ft.Page):
     page.bgcolor = ThemeConfig.BG_COLOR
 
     # 设置窗口为自适应（移动端）
-    page.window.width = None  # 自适应宽度
-    page.window.height = None  # 自适应高度
-    page.window.resizable = True  # 允许调整大小
+    page.window_width = None  # 自适应宽度
+    page.window_height = None  # 自适应高度
+    page.window_resizable = True  # 允许调整大小
 
     # 设置视口适配（针对移动端）
     page.scroll = ft.ScrollMode.AUTO

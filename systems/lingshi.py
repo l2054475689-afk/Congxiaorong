@@ -2,7 +2,7 @@
 import flet as ft
 from database.db_manager import DatabaseManager
 from ui.styles import Styles
-from config import ThemeConfig
+from config import ThemeConfig, GameConfig
 from datetime import datetime, timedelta
 from typing import List, Tuple
 
@@ -529,15 +529,29 @@ class LingshiSystem:
                 color = ThemeConfig.DANGER_COLOR
                 sign = "-"
             
+            # 构建显示文本：优先显示分类，备注作为副标题
+            display_title = category or "未分类"
+            display_controls = [
+                ft.Text(display_title, size=14, weight=ft.FontWeight.W_500),
+            ]
+
+            # 如果有备注，添加到下方
+            if description:
+                display_controls.append(
+                    ft.Text(description, size=12, color=ThemeConfig.TEXT_SECONDARY)
+                )
+
+            # 添加时间
+            display_controls.append(
+                ft.Text(time_str, size=11, color=ThemeConfig.TEXT_SECONDARY, italic=True)
+            )
+
             record_items.append(
                 ft.Container(
                     content=ft.Row(
                         controls=[
                             ft.Column(
-                                controls=[
-                                    ft.Text(description or category or "未分类", size=14),
-                                    ft.Text(time_str, size=12, color=ThemeConfig.TEXT_SECONDARY),
-                                ],
+                                controls=display_controls,
                                 spacing=2,
                                 expand=True,
                             ),
@@ -567,15 +581,71 @@ class LingshiSystem:
     def _show_add_record_dialog(self, e):
         """显示添加记录对话框"""
         page = e.page
-        
-        # 创建输入控件
+
+        # 货币选择下拉框
+        currency_dropdown = ft.Dropdown(
+            label="货币类型",
+            width=300,
+            options=[
+                ft.dropdown.Option("CNY", "人民币 (¥)"),
+                ft.dropdown.Option("USD", "美元 ($)"),
+            ],
+            value="CNY",
+        )
+
+        # 金额输入框 - 前缀会根据货币类型动态更新
         amount_field = ft.TextField(
             label="金额",
             prefix_text="¥",
             keyboard_type=ft.KeyboardType.NUMBER,
             width=300,
         )
-        
+
+        # 汇率提示文本
+        rate_hint = ft.Text(
+            f"当前汇率: 1 USD = {GameConfig.USD_TO_CNY_RATE} CNY",
+            size=12,
+            color=ThemeConfig.TEXT_SECONDARY,
+            visible=False,
+        )
+
+        # 换算预览文本
+        conversion_preview = ft.Text(
+            "",
+            size=12,
+            color=ThemeConfig.INFO_COLOR,
+            visible=False,
+        )
+
+        def on_currency_change(e):
+            """货币类型变化时更新UI"""
+            if currency_dropdown.value == "USD":
+                amount_field.prefix_text = "$"
+                rate_hint.visible = True
+                update_conversion_preview(None)
+            else:
+                amount_field.prefix_text = "¥"
+                rate_hint.visible = False
+                conversion_preview.visible = False
+            page.update()
+
+        def update_conversion_preview(e):
+            """更新换算预览"""
+            if currency_dropdown.value == "USD" and amount_field.value:
+                try:
+                    usd_amount = float(amount_field.value)
+                    cny_amount = usd_amount * GameConfig.USD_TO_CNY_RATE
+                    conversion_preview.value = f"≈ ¥{cny_amount:,.2f} 人民币"
+                    conversion_preview.visible = True
+                except ValueError:
+                    conversion_preview.visible = False
+            else:
+                conversion_preview.visible = False
+            page.update()
+
+        currency_dropdown.on_change = on_currency_change
+        amount_field.on_change = update_conversion_preview
+
         type_dropdown = ft.Dropdown(
             label="类型",
             width=300,
@@ -585,7 +655,7 @@ class LingshiSystem:
             ],
             value="expense",
         )
-        
+
         category_dropdown = ft.Dropdown(
             label="分类",
             width=300,
@@ -605,70 +675,93 @@ class LingshiSystem:
             ],
             value="其他",
         )
-        
+
         custom_category_field = ft.TextField(
-            label="自定义分类（选择自定义时填写）",
+            label="自定义分类（选择自定义或其他时填写）",
             width=300,
             hint_text="请输入自定义分类名称",
         )
-        
+
         description_field = ft.TextField(
             label="备注（可选）",
             multiline=True,
             width=300,
             max_lines=3,
         )
-        
+
         def close_dialog(e):
             dialog.open = False
             page.update()
-        
+
         def save_record(e):
             if amount_field.value:
                 try:
                     amount = float(amount_field.value)
+
+                    # 如果是美元，自动转换为人民币
+                    original_amount = amount
+                    original_currency = currency_dropdown.value
+                    if currency_dropdown.value == "USD":
+                        amount = amount * GameConfig.USD_TO_CNY_RATE
+
                     # 处理自定义分类
                     final_category = category_dropdown.value
-                    if category_dropdown.value == "自定义" and custom_category_field.value:
+                    if (category_dropdown.value == "自定义" or category_dropdown.value == "其他") and custom_category_field.value:
                         final_category = custom_category_field.value
-                    
+
+                    # 在备注中添加原始货币信息（如果是美元）
+                    final_description = description_field.value or ""
+                    if original_currency == "USD":
+                        currency_note = f"[原始: ${original_amount:,.2f} USD]"
+                        if final_description:
+                            final_description = f"{final_description} {currency_note}"
+                        else:
+                            final_description = currency_note
+
                     self.db.add_finance_record(
                         record_type=type_dropdown.value,
                         amount=amount,
                         category=final_category,
-                        description=description_field.value or None,
+                        description=final_description or None,
                     )
-                    
+
                     # 显示记账成功信息
                     sign = "+" if type_dropdown.value == "income" else "-"
-                    print(f"记账成功：{sign}¥{amount:,.0f} ({final_category})")
-                    
+                    if original_currency == "USD":
+                        print(f"记账成功：{sign}${original_amount:,.2f} USD → ¥{amount:,.2f} CNY ({final_category})")
+                    else:
+                        print(f"记账成功：{sign}¥{amount:,.0f} ({final_category})")
+
                     close_dialog(e)
                     # 刷新页面
                     if self.refresh_callback:
                         self.refresh_callback()
                 except ValueError:
                     pass
-        
+
         dialog = ft.AlertDialog(
             title=ft.Text("记一笔"),
             content=ft.Column(
                 controls=[
-                    type_dropdown,
+                    currency_dropdown,
                     amount_field,
+                    rate_hint,
+                    conversion_preview,
+                    type_dropdown,
                     category_dropdown,
                     custom_category_field,
                     description_field,
                 ],
-                height=300,
+                height=400,
                 spacing=10,
+                scroll=ft.ScrollMode.AUTO,
             ),
             actions=[
                 ft.TextButton("取消", on_click=close_dialog),
                 ft.TextButton("保存", on_click=save_record),
             ],
         )
-        
+
         page.dialog = dialog
         dialog.open = True
         page.update()

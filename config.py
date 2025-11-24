@@ -9,35 +9,30 @@ VERSION = "1.0.0"
 WINDOW_WIDTH = 412  # 调整为更适合6.36英寸
 WINDOW_HEIGHT = 915  # 调整高度
 
-# 数据库配置 - 优化为支持Android
+# 数据库配置 - 优化为支持Android（方案1：使用当前工作目录）
 def get_app_data_dir():
     """获取应用数据目录（支持跨平台）"""
     try:
-        # 尝试检测Android环境
-        if 'ANDROID_STORAGE' in os.environ or sys.platform == 'android':
-            # Android平台使用内部存储
-            try:
-                from android.storage import app_storage_path
-                return Path(app_storage_path())
-            except:
-                # 如果导入失败，使用临时目录
-                import tempfile
-                app_data = Path(tempfile.gettempdir()) / 'fanrenxiuxian'
-                app_data.mkdir(exist_ok=True)
-                return app_data
+        # 首先尝试检测是否在Android环境
+        if 'ANDROID_STORAGE' in os.environ or sys.platform == 'android' or hasattr(sys, 'getandroidapilevel'):
+            # Android平台：使用当前工作目录（Flet会自动设置为应用私有目录）
+            app_data = Path.cwd() / 'data'
+            app_data.mkdir(exist_ok=True)
+            print(f"Android环境：使用应用私有存储 {app_data}")
+            return app_data
         elif os.name == 'nt':  # Windows
-            app_data = os.path.expanduser('~\\AppData\\Local\\FanRenXiuXian')
+            app_data = Path(os.path.expanduser('~\\AppData\\Local\\FanRenXiuXian'))
         else:  # Linux/Mac
-            app_data = os.path.expanduser('~/.fanrenxiuxian')
+            app_data = Path(os.path.expanduser('~/.fanrenxiuxian'))
 
         # 创建目录如果不存在
-        os.makedirs(app_data, exist_ok=True)
-        return Path(app_data)
+        app_data.mkdir(parents=True, exist_ok=True)
+        print(f"桌面环境：使用数据目录 {app_data}")
+        return app_data
     except Exception as e:
-        print(f"获取应用数据目录失败: {e}")
-        # 如果以上都失败，使用临时目录
-        import tempfile
-        fallback_dir = Path(tempfile.gettempdir()) / 'fanrenxiuxian'
+        print(f"获取应用数据目录失败: {e}，使用当前目录")
+        # 如果以上都失败，使用当前目录的data子目录
+        fallback_dir = Path.cwd() / 'data'
         fallback_dir.mkdir(exist_ok=True)
         return fallback_dir
 
@@ -109,6 +104,9 @@ class GameConfig:
     
     # 灵石设定
     DEFAULT_TARGET_MONEY = 5000000  # 默认目标500万
+
+    # 货币设定
+    USD_TO_CNY_RATE = 7.25  # 美元兑人民币汇率（可根据实际调整）
     
     # 境界等级
     REALM_LEVELS = ["练气期", "筑基期", "结丹期", "元婴期", "化神期"]

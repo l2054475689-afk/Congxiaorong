@@ -44,7 +44,6 @@ class MainWindow:
             bgcolor=ThemeConfig.PRIMARY_COLOR,
             on_click=self.show_add_dialog,
             visible=False,
-            elevation=8,
             shape=ft.RoundedRectangleBorder(radius=16),
         )
         

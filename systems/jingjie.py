@@ -550,8 +550,8 @@ class JingjieSystem:
                             color=ThemeConfig.PRIMARY_COLOR,
                             bgcolor=ft.colors.with_opacity(0.1, ThemeConfig.PRIMARY_COLOR),
                             height=8,
-                            border_radius=4,
                         ),
+                        border_radius=4,
                         margin=ft.margin.only(top=8, bottom=10),
                     ),
                     ft.Column(
@@ -1376,9 +1376,9 @@ class JingjieSystem:
                             color="#FF5722",
                             bgcolor="#FFE5E0",
                             height=8,
-                            border_radius=4,
                         ),
                         margin=ft.margin.only(top=8, bottom=12),
+                        border_radius=4,
                     ),
                     ft.Column(
                         controls=node_widgets,
@@ -1391,12 +1391,6 @@ class JingjieSystem:
             padding=20,
             border_radius=ThemeConfig.CARD_RADIUS,
             border=ft.border.all(1.5, "#FFE5E0"),
-            shadow=ft.BoxShadow(
-                spread_radius=1,
-                blur_radius=10,
-                color=ft.colors.with_opacity(0.08, "#FF5722"),
-                offset=ft.Offset(0, 2),
-            ),
         )
 
     def _handle_fuben_toggle(self, e, fuben_name: str, node: str):

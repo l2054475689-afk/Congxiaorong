@@ -14,15 +14,21 @@ class DatabaseManager:
     def __init__(self, db_path: str = None):
         # 使用绝对路径，确保有写权限的目录
         if db_path is None:
-            # 使用用户主目录或应用数据目录
-            if os.name == 'nt':  # Windows
+            # 检测Android环境
+            if 'ANDROID_STORAGE' in os.environ or os.sys.platform == 'android' or hasattr(os.sys, 'getandroidapilevel'):
+                # Android平台：使用当前工作目录（Flet会自动设置为应用私有目录）
+                from pathlib import Path
+                app_data = Path.cwd() / 'data'
+                app_data.mkdir(exist_ok=True)
+                self.db_path = str(app_data / 'immortal_cultivation.db')
+            elif os.name == 'nt':  # Windows
                 app_data = os.path.expanduser('~\\AppData\\Local\\FanRenXiuXian')
+                os.makedirs(app_data, exist_ok=True)
+                self.db_path = os.path.join(app_data, 'immortal_cultivation.db')
             else:  # Linux/Mac
                 app_data = os.path.expanduser('~/.fanrenxiuxian')
-
-            # 创建目录如果不存在
-            os.makedirs(app_data, exist_ok=True)
-            self.db_path = os.path.join(app_data, 'immortal_cultivation.db')
+                os.makedirs(app_data, exist_ok=True)
+                self.db_path = os.path.join(app_data, 'immortal_cultivation.db')
         else:
             self.db_path = db_path
 

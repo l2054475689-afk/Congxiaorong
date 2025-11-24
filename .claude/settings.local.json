@@ -24,7 +24,12 @@
       "Bash(cmd /c:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(git pull origin main --allow-unrelated-histories --no-edit)"
+      "Bash(git pull origin main --allow-unrelated-histories --no-edit)",
+      "Bash(git add:*)",
+      "Bash(gh run list:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(cat:*)",
+      "Bash(del /Q *.md *.txt 2)"
     ],
     "deny": [],
     "ask": []
