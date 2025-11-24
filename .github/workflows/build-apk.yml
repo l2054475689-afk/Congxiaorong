@@ -67,7 +67,7 @@ jobs:
     - name: Build APK
       run: |
         echo "Building APK with Flet..."
-        flet build apk --project "凡人修仙3万天"
+        flet build apk --project fanren_xiuxian
 
     - name: Rename APK
       run: |
