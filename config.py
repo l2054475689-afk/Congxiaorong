@@ -1,33 +1,34 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 from pathlib import Path
 
-# 应用基础配置
-APP_NAME = "凡人修仙3w天"
+# Application Configuration
+APP_NAME = "FanRen XiuXian 3W Day"
 VERSION = "1.0.0"
-# 6.36英寸屏幕，按照16:9比例计算
-WINDOW_WIDTH = 412  # 调整为更适合6.36英寸
-WINDOW_HEIGHT = 915  # 调整高度
+# Screen size: 6.36 inch, 16:9 ratio
+WINDOW_WIDTH = 412
+WINDOW_HEIGHT = 915
 
-# 数据库配置 - 优化为支持Android（方案1：使用当前工作目录）
+# Database Configuration - Android compatible
 def get_app_data_dir():
-    """获取应用数据目录（支持跨平台）"""
+    """Get app data directory (cross-platform)"""
     try:
-        # 首先尝试检测是否在Android环境
+        # Detect Android environment
         if 'ANDROID_STORAGE' in os.environ or sys.platform == 'android' or hasattr(sys, 'getandroidapilevel'):
-            # Android平台：使用当前工作目录（Flet会自动设置为应用私有目录）
+            # Android: use current working directory (Flet auto-sets to app private dir)
             try:
                 app_data = Path.cwd() / 'data'
                 app_data.mkdir(exist_ok=True)
                 return app_data
             except Exception as e:
-                # Android上如果创建失败，使用/data/data目录
+                # Android fallback: use /data/data directory
                 try:
                     app_data = Path('/data/data') / 'com.fanrenxiuxian.app' / 'files' / 'data'
                     app_data.mkdir(parents=True, exist_ok=True)
                     return app_data
                 except:
-                    # 最后降级到临时目录
+                    # Final fallback: temp directory
                     import tempfile
                     app_data = Path(tempfile.gettempdir()) / 'fanrenxiuxian' / 'data'
                     app_data.mkdir(parents=True, exist_ok=True)
@@ -37,96 +38,94 @@ def get_app_data_dir():
         else:  # Linux/Mac
             app_data = Path(os.path.expanduser('~/.fanrenxiuxian'))
 
-        # 创建目录如果不存在
+        # Create directory if not exists
         app_data.mkdir(parents=True, exist_ok=True)
         return app_data
     except Exception as e:
-        # 如果以上都失败，使用临时目录
+        # Final fallback: temp directory
         import tempfile
         fallback_dir = Path(tempfile.gettempdir()) / 'fanrenxiuxian'
         fallback_dir.mkdir(parents=True, exist_ok=True)
         return fallback_dir
 
-# 延迟初始化，避免导入时出错
+# Delayed initialization to avoid import-time errors
 BASE_DIR = None
 DB_PATH = None
 
 def init_paths():
-    """初始化路径（延迟初始化）"""
+    """Initialize paths (delayed initialization)"""
     global BASE_DIR, DB_PATH
     if BASE_DIR is None:
         BASE_DIR = get_app_data_dir()
         DB_PATH = BASE_DIR / "immortal_cultivation.db"
     return BASE_DIR, DB_PATH
 
-# 主题配置
+# Theme Configuration
 class ThemeConfig:
-    # 主色调 - 仙侠紫金配色
-    PRIMARY_COLOR = "#8B5CF6"  # 紫色主题（更鲜艳）
-    PRIMARY_LIGHT = "#A78BFA"  # 浅紫色
-    PRIMARY_DARK = "#7C3AED"   # 深紫色
-    SECONDARY_COLOR = "#F59E0B"  # 金色辅助色
+    # Primary colors - Purple and Gold theme
+    PRIMARY_COLOR = "#8B5CF6"  # Purple
+    PRIMARY_LIGHT = "#A78BFA"  # Light purple
+    PRIMARY_DARK = "#7C3AED"   # Dark purple
+    SECONDARY_COLOR = "#F59E0B"  # Gold
 
-    # 渐变色配置
-    PRIMARY_GRADIENT = ["#8B5CF6", "#EC4899"]  # 紫粉渐变
-    GOLD_GRADIENT = ["#F59E0B", "#FBBF24", "#FCD34D"]  # 金色渐变
-    LIFE_GRADIENT = ["#EF4444", "#F87171"]  # 生命渐变
-    SPIRIT_GRADIENT = ["#06B6D4", "#22D3EE"]  # 心境渐变
-    REALM_GRADIENT = ["#8B5CF6", "#6366F1", "#3B82F6"]  # 境界渐变
-    SUCCESS_GRADIENT = ["#10B981", "#34D399"]  # 成功渐变
+    # Gradient colors
+    PRIMARY_GRADIENT = ["#8B5CF6", "#EC4899"]  # Purple-Pink gradient
+    GOLD_GRADIENT = ["#F59E0B", "#FBBF24", "#FCD34D"]  # Gold gradient
+    LIFE_GRADIENT = ["#EF4444", "#F87171"]  # Life gradient
+    SPIRIT_GRADIENT = ["#06B6D4", "#22D3EE"]  # Spirit gradient
+    REALM_GRADIENT = ["#8B5CF6", "#6366F1", "#3B82F6"]  # Realm gradient
+    SUCCESS_GRADIENT = ["#10B981", "#34D399"]  # Success gradient
 
-    # 功能色
-    SUCCESS_COLOR = "#10B981"  # 绿色
-    DANGER_COLOR = "#EF4444"   # 红色
-    WARNING_COLOR = "#F59E0B"  # 橙色
-    INFO_COLOR = "#3B82F6"     # 蓝色
+    # Functional colors
+    SUCCESS_COLOR = "#10B981"  # Green
+    DANGER_COLOR = "#EF4444"   # Red
+    WARNING_COLOR = "#F59E0B"  # Orange
+    INFO_COLOR = "#3B82F6"     # Blue
 
-    # 背景色
-    BG_COLOR = "#F8FAFC"  # 浅灰蓝背景
-    BG_GRADIENT = ["#F8FAFC", "#F1F5F9"]  # 背景渐变
+    # Background colors
+    BG_COLOR = "#F8FAFC"  # Light gray-blue
+    BG_GRADIENT = ["#F8FAFC", "#F1F5F9"]  # Background gradient
     CARD_COLOR = "#FFFFFF"
     CARD_HOVER = "#FAFAFA"
 
-    # 文字颜色
-    TEXT_PRIMARY = "#1E293B"  # 深灰蓝
-    TEXT_SECONDARY = "#64748B"  # 中灰
-    TEXT_DISABLED = "#94A3B8"  # 浅灰
-    TEXT_INVERSE = "#FFFFFF"  # 白色文字
+    # Text colors
+    TEXT_PRIMARY = "#1E293B"  # Dark gray-blue
+    TEXT_SECONDARY = "#64748B"  # Medium gray
+    TEXT_DISABLED = "#94A3B8"  # Light gray
+    TEXT_INVERSE = "#FFFFFF"  # White text
 
-    # 边框颜色
+    # Border colors
     BORDER_COLOR = "#E2E8F0"
     BORDER_LIGHT = "#F1F5F9"
 
-    # 阴影配置
+    # Shadow configuration
     SHADOW_SM = "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
     SHADOW_MD = "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
     SHADOW_LG = "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
     SHADOW_XL = "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
 
-    # 尺寸配置
+    # Size configuration
     PAGE_PADDING = 20
     CARD_PADDING = 20
-    CARD_RADIUS = 16  # 更大的圆角
+    CARD_RADIUS = 16
     ITEM_SPACING = 12
     SECTION_SPACING = 24
 
-# 游戏设定
+# Game Configuration
 class GameConfig:
-    # 生命设定
-    MAX_AGE = 80  # 最大年龄
-    MINUTES_PER_DAY = 24 * 60  # 每天消耗的血量
-    BLOOD_DECREASE_PER_MINUTE = 1  # 每分钟减少的血量
-    
-    # 心境设定
+    # Life settings
+    MAX_AGE = 80  # Maximum age
+    MINUTES_PER_DAY = 24 * 60  # Blood consumed per day
+    BLOOD_DECREASE_PER_MINUTE = 1  # Blood decreased per minute
+
+    # Spirit settings
     MIN_SPIRIT = -80
     MAX_SPIRIT = 200
     DEFAULT_SPIRIT = 0
-    
-    # 灵石设定
-    DEFAULT_TARGET_MONEY = 5000000  # 默认目标500万
 
-    # 货币设定
-    USD_TO_CNY_RATE = 7.25  # 美元兑人民币汇率（可根据实际调整）
-    
-    # 境界等级
-    REALM_LEVELS = ["练气期", "筑基期", "结丹期", "元婴期", "化神期"]
+    # Currency settings
+    DEFAULT_TARGET_MONEY = 5000000  # Default target: 5 million
+    USD_TO_CNY_RATE = 7.25  # USD to CNY exchange rate
+
+    # Realm levels
+    REALM_LEVELS = ["Qi Refining", "Foundation", "Golden Core", "Nascent Soul", "Spirit Severing"]
