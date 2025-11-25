@@ -2,53 +2,55 @@ import flet as ft
 import traceback
 import sys
 import os
+import time
 
 def main(page: ft.Page):
-    """主函数 - 诊断版"""
+    """Main function - diagnostic version"""
+    log_text = ft.Column([], scroll=ft.ScrollMode.AUTO, expand=True)
+    page.add(log_text)
+
+    def log(msg, color=None):
+        """Add log message without immediate update"""
+        log_text.controls.append(
+            ft.Text(msg, size=12, color=color)
+        )
+
     try:
-        # Step 1: 基础信息
-        page.add(ft.Text("Step 1: main启动", size=16))
+        log("Step 1: main started")
+        log(f"Python: {sys.version[:30]}")
+        log(f"Platform: {sys.platform}")
+        log(f"CWD: {os.getcwd()[:40]}")
+        page.update()  # Single update for step 1
+
+        time.sleep(0.5)  # Small delay
+
+        # Step 2: Import config
+        log("Step 2: Importing config...")
         page.update()
 
-        # Step 1.1: 显示环境信息
         try:
-            page.add(ft.Text(f"Python: {sys.version[:20]}", size=10))
-            page.add(ft.Text(f"Platform: {sys.platform}", size=10))
-            page.add(ft.Text(f"CWD: {os.getcwd()[:30]}", size=10))
-            page.update()
-        except Exception as e:
-            page.add(ft.Text(f"环境信息错误: {str(e)[:50]}", size=10))
-            page.update()
-
-        # Step 2: 测试导入config
-        try:
-            page.add(ft.Text("Step 2: 开始导入config...", size=16))
-            page.update()
-
             import config
-            page.add(ft.Text("Step 2.1: config模块导入成功", size=14, color=ft.colors.GREEN))
+            log("Step 2.1: config module imported", ft.colors.GREEN)
             page.update()
+
+            time.sleep(0.3)
 
             from config import ThemeConfig
-            page.add(ft.Text("Step 2.2: ThemeConfig导入成功", size=14, color=ft.colors.GREEN))
+            log("Step 2.2: ThemeConfig imported", ft.colors.GREEN)
             page.update()
 
         except Exception as e:
-            page.add(ft.Text(f"Step 2 失败!", size=14, color=ft.colors.RED))
-            page.add(ft.Text(f"错误: {str(e)[:80]}", size=10, color=ft.colors.RED))
-            page.add(ft.Text(f"类型: {type(e).__name__}", size=10))
+            log(f"Step 2 FAILED!", ft.colors.RED)
+            log(f"Error: {str(e)[:100]}", ft.colors.RED)
+            log(f"Type: {type(e).__name__}")
             page.update()
 
-            # 显示详细错误
-            try:
-                error_lines = traceback.format_exc().split('\n')
-                for i, line in enumerate(error_lines[:15]):
-                    if line.strip():
-                        page.add(ft.Text(f"{line[:70]}", size=8))
-                        if i % 3 == 0:
-                            page.update()
-            except:
-                pass
+            # Show traceback
+            error_lines = traceback.format_exc().split('\n')
+            for line in error_lines[:20]:
+                if line.strip():
+                    log(line[:80])
+            page.update()
             return
 
         # 设置页面基本属性
