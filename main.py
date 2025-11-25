@@ -32,9 +32,44 @@ def main(page: ft.Page):
         page.spacing = 0
         add_log("Step 2: Page properties set OK")
 
-        add_log("Step 3: Importing MainWindow...")
+        add_log("Step 3: Testing system imports...")
+
+        # Test each import individually
+        add_log("Step 3.1: Importing database...")
+        from database.db_manager import DatabaseManager
+        add_log("Step 3.1: OK")
+
+        add_log("Step 3.2: Importing panel...")
+        from systems.panel import PanelSystem
+        add_log("Step 3.2: OK")
+
+        add_log("Step 3.3: Importing xinjing...")
+        from systems.xinjing import XinjingSystem
+        add_log("Step 3.3: OK")
+
+        add_log("Step 3.4: Importing jingjie...")
+        from systems.jingjie import JingjieSystem
+        add_log("Step 3.4: OK")
+
+        add_log("Step 3.5: Importing lingshi...")
+        from systems.lingshi import LingshiSystem
+        add_log("Step 3.5: OK")
+
+        add_log("Step 3.6: Importing tongyu...")
+        from systems.tongyu import TongyuSystem
+        add_log("Step 3.6: OK")
+
+        add_log("Step 3.7: Importing lizhi...")
+        from systems.lizhi import LizhiSystem
+        add_log("Step 3.7: OK")
+
+        add_log("Step 3.8: Importing settings...")
+        from systems.settings import SettingsSystem
+        add_log("Step 3.8: OK")
+
+        add_log("Step 3.9: Importing MainWindow...")
         from ui.main_window import MainWindow
-        add_log("Step 3: MainWindow imported OK")
+        add_log("Step 3.9: MainWindow imported OK")
 
         add_log("Step 4: Creating MainWindow instance...")
         window = MainWindow(page)
