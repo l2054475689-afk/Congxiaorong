@@ -2,56 +2,63 @@ import flet as ft
 import traceback
 import sys
 import os
-import time
 
 def main(page: ft.Page):
-    """Main function - diagnostic version"""
-    log_text = ft.Column([], scroll=ft.ScrollMode.AUTO, expand=True)
-    page.add(log_text)
+    """Main function - minimal update version"""
 
-    def log(msg, color=None):
-        """Add log message without immediate update"""
-        log_text.controls.append(
-            ft.Text(msg, size=12, color=color)
-        )
+    # Create a simple text control for logging
+    output = ft.Text("Starting...", selectable=True, size=11)
+    page.add(output)
+    page.update()
+
+    logs = []
+
+    def update_log():
+        output.value = "\n".join(logs[-30:])  # Show last 30 lines
+        try:
+            page.update()
+        except:
+            pass
 
     try:
-        log("Step 1: main started")
-        log(f"Python: {sys.version[:30]}")
-        log(f"Platform: {sys.platform}")
-        log(f"CWD: {os.getcwd()[:40]}")
-        page.update()  # Single update for step 1
+        logs.append("=== DIAGNOSTIC MODE ===")
+        logs.append(f"Step 1: Started")
+        logs.append(f"Python: {sys.version[:35]}")
+        logs.append(f"Platform: {sys.platform}")
+        update_log()
 
-        time.sleep(0.5)  # Small delay
+        # Critical test: Can we import anything?
+        logs.append("Step 2: Test import sys")
+        import sys as sys2
+        logs.append("Step 2.1: sys import OK")
+        update_log()
 
-        # Step 2: Import config
-        log("Step 2: Importing config...")
-        page.update()
+        # Test pathlib
+        logs.append("Step 3: Test import pathlib")
+        from pathlib import Path
+        logs.append("Step 3.1: pathlib OK")
+        update_log()
 
-        try:
-            import config
-            log("Step 2.1: config module imported", ft.colors.GREEN)
-            page.update()
+        # Now test config
+        logs.append("Step 4: Import config...")
+        update_log()
 
-            time.sleep(0.3)
+        import config
+        logs.append("Step 4.1: config imported!")
+        update_log()
 
-            from config import ThemeConfig
-            log("Step 2.2: ThemeConfig imported", ft.colors.GREEN)
-            page.update()
+        from config import ThemeConfig
+        logs.append("Step 4.2: ThemeConfig imported!")
+        update_log()
 
-        except Exception as e:
-            log(f"Step 2 FAILED!", ft.colors.RED)
-            log(f"Error: {str(e)[:100]}", ft.colors.RED)
-            log(f"Type: {type(e).__name__}")
-            page.update()
+        logs.append("=== SUCCESS ===")
+        update_log()
 
-            # Show traceback
-            error_lines = traceback.format_exc().split('\n')
-            for line in error_lines[:20]:
-                if line.strip():
-                    log(line[:80])
-            page.update()
-            return
+    except Exception as e:
+        logs.append(f"ERROR: {str(e)[:100]}")
+        logs.append(f"Type: {type(e).__name__}")
+        logs.extend(traceback.format_exc().split('\n')[:15])
+        update_log()
 
         # 设置页面基本属性
         page.title = "凡人修仙3万天"
