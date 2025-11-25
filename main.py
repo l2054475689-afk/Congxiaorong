@@ -1,20 +1,54 @@
 import flet as ft
+import traceback
+import sys
+import os
 
 def main(page: ft.Page):
-    """主函数 - 测试版"""
+    """主函数 - 诊断版"""
     try:
-        # 显示测试信息
-        page.add(ft.Text("Step 1: main函数已启动", size=20))
+        # Step 1: 基础信息
+        page.add(ft.Text("Step 1: main启动", size=16))
         page.update()
 
-        # 测试导入config
+        # Step 1.1: 显示环境信息
         try:
-            from config import ThemeConfig
-            page.add(ft.Text("Step 2: config导入成功", size=20, color=ft.colors.GREEN))
+            page.add(ft.Text(f"Python: {sys.version[:20]}", size=10))
+            page.add(ft.Text(f"Platform: {sys.platform}", size=10))
+            page.add(ft.Text(f"CWD: {os.getcwd()[:30]}", size=10))
             page.update()
         except Exception as e:
-            page.add(ft.Text(f"Step 2 失败: {str(e)}", size=20, color=ft.colors.RED))
+            page.add(ft.Text(f"环境信息错误: {str(e)[:50]}", size=10))
             page.update()
+
+        # Step 2: 测试导入config
+        try:
+            page.add(ft.Text("Step 2: 开始导入config...", size=16))
+            page.update()
+
+            import config
+            page.add(ft.Text("Step 2.1: config模块导入成功", size=14, color=ft.colors.GREEN))
+            page.update()
+
+            from config import ThemeConfig
+            page.add(ft.Text("Step 2.2: ThemeConfig导入成功", size=14, color=ft.colors.GREEN))
+            page.update()
+
+        except Exception as e:
+            page.add(ft.Text(f"Step 2 失败!", size=14, color=ft.colors.RED))
+            page.add(ft.Text(f"错误: {str(e)[:80]}", size=10, color=ft.colors.RED))
+            page.add(ft.Text(f"类型: {type(e).__name__}", size=10))
+            page.update()
+
+            # 显示详细错误
+            try:
+                error_lines = traceback.format_exc().split('\n')
+                for i, line in enumerate(error_lines[:15]):
+                    if line.strip():
+                        page.add(ft.Text(f"{line[:70]}", size=8))
+                        if i % 3 == 0:
+                            page.update()
+            except:
+                pass
             return
 
         # 设置页面基本属性
