@@ -1,94 +1,89 @@
+# -*- coding: utf-8 -*-
 import flet as ft
 
 def main(page: ft.Page):
-    """Main application entry point - diagnostic version"""
+    """Main application entry point - lazy loading version"""
 
-    # Create diagnostic output
-    status = ft.Text("Initializing...", size=12, selectable=True)
+    # Create status display
+    status = ft.Text("Loading...", size=12, selectable=True)
     page.add(status)
     page.update()
 
     logs = []
 
-    def add_log(msg):
+    def log(msg):
         logs.append(msg)
-        status.value = "\n".join(logs[-20:])
+        status.value = "\n".join(logs[-25:])
         try:
             page.update()
         except:
             pass
 
     try:
-        add_log("Step 1: Importing config...")
-        from config import APP_NAME, WINDOW_WIDTH, WINDOW_HEIGHT, ThemeConfig
-        add_log("Step 1: Config imported OK")
+        log("Step 1: Importing config...")
+        from config import ThemeConfig, GameConfig
+        log("Step 1: OK")
 
-        add_log("Step 2: Setting page properties...")
+        log("Step 2: Setting page properties...")
         page.title = "FanRen XiuXian 3W Day"
         page.theme_mode = ft.ThemeMode.LIGHT
         page.bgcolor = ThemeConfig.BG_COLOR
         page.scroll = ft.ScrollMode.AUTO
         page.padding = 0
-        page.spacing = 0
-        add_log("Step 2: Page properties set OK")
+        log("Step 2: OK")
 
-        add_log("Step 3: Testing system imports...")
+        log("Step 3: Creating simple UI...")
+        # Create a simple working UI first
+        page.clean()
 
-        # Test each import individually
-        add_log("Step 3.1: Importing database...")
-        from database.db_manager import DatabaseManager
-        add_log("Step 3.1: OK")
+        # Simple working interface
+        header = ft.Container(
+            content=ft.Text("FanRen XiuXian 3W Day", size=20, weight=ft.FontWeight.BOLD),
+            padding=20,
+            bgcolor=ThemeConfig.PRIMARY_COLOR,
+        )
 
-        add_log("Step 3.2: Importing panel...")
-        from systems.panel import PanelSystem
-        add_log("Step 3.2: OK")
+        content = ft.Column([
+            ft.Text("App loaded successfully!", size=16),
+            ft.Text("Systems will load on demand.", size=12),
+            ft.ElevatedButton("Load Full App", on_click=lambda _: load_full_app())
+        ], padding=20)
 
-        add_log("Step 3.3: Importing xinjing...")
-        from systems.xinjing import XinjingSystem
-        add_log("Step 3.3: OK")
+        page.add(ft.Column([header, content], expand=True))
+        page.update()
+        log("Step 3: Simple UI loaded")
 
-        add_log("Step 3.4: Importing jingjie...")
-        from systems.jingjie import JingjieSystem
-        add_log("Step 3.4: OK")
+        def load_full_app():
+            """Load full application when user clicks"""
+            try:
+                status2 = ft.Text("Loading full app...", size=12)
+                page.clean()
+                page.add(status2)
+                page.update()
 
-        add_log("Step 3.5: Importing lingshi...")
-        from systems.lingshi import LingshiSystem
-        add_log("Step 3.5: OK")
+                from ui.main_window import MainWindow
+                window = MainWindow(page)
+                page.clean()
+                window.setup()
 
-        add_log("Step 3.6: Importing tongyu...")
-        from systems.tongyu import TongyuSystem
-        add_log("Step 3.6: OK")
-
-        add_log("Step 3.7: Importing lizhi...")
-        from systems.lizhi import LizhiSystem
-        add_log("Step 3.7: OK")
-
-        add_log("Step 3.8: Importing settings...")
-        from systems.settings import SettingsSystem
-        add_log("Step 3.8: OK")
-
-        add_log("Step 3.9: Importing MainWindow...")
-        from ui.main_window import MainWindow
-        add_log("Step 3.9: MainWindow imported OK")
-
-        add_log("Step 4: Creating MainWindow instance...")
-        window = MainWindow(page)
-        add_log("Step 4: MainWindow instance created OK")
-
-        add_log("Step 5: Calling window.setup()...")
-        page.clean()  # Clear diagnostic messages
-        window.setup()
-        add_log("Step 5: Setup complete!")
+            except Exception as e:
+                import traceback
+                page.clean()
+                error_text = ft.Column([
+                    ft.Text("Error loading app", size=18, color=ft.colors.RED),
+                    ft.Text(str(e)[:200], size=12, selectable=True),
+                    ft.Text(traceback.format_exc()[:1000], size=10, selectable=True),
+                ], scroll=ft.ScrollMode.AUTO)
+                page.add(error_text)
+                page.update()
 
     except Exception as e:
         import traceback
-        add_log(f"ERROR at current step!")
-        add_log(f"Error: {str(e)[:200]}")
-        add_log(f"Type: {type(e).__name__}")
-        add_log("--- Traceback ---")
-        for line in traceback.format_exc().split('\n')[:25]:
+        log(f"ERROR: {str(e)[:150]}")
+        log(f"Type: {type(e).__name__}")
+        for line in traceback.format_exc().split('\n')[:20]:
             if line.strip():
-                add_log(line[:100])
+                log(line[:90])
 
 if __name__ == "__main__":
     ft.app(target=main)
